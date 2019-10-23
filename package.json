@@ -1,0 +1,50 @@
+{
+  "name": "@vlsergey/react-promise",
+  "version": "1.0.0",
+  "description": "React wrappers for Promises",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "scripts": {
+    "eslint:check": "eslint --ignore-pattern \"!.eslintrc.js\" .eslintrc.js src/**/*.js",
+    "eslint:fix": "eslint --ignore-pattern \"!.eslintrc.js\" --fix .eslintrc.js src/**/*.js",
+    "preversion": "npm run eslint:check",
+    "version": "",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vlsergey/react-promise.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vlsergey/react-promise/issues"
+  },
+  "homepage": "https://github.com/vlsergey/react-promise#readme",
+  "keywords": [
+    "react",
+    "promise",
+    "promises",
+    "vlsergey"
+  ],
+  "author": {
+    "name": "Sergey Vladimirov",
+    "email": "vlsergey@gmail.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@vlsergey/eslint-config": "0.0.3",
+    "prop-types": "^15.7.0",
+    "react": "^16.11.0"
+  },
+  "peerDependencies": {
+    "prop-types": "^15.7.0",
+    "react": "^16.0.0"
+  },
+  "dependencies": {
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.5.1",
+    "eslint-plugin-flowtype": "^4.3.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.16.0"
+  }
+}
