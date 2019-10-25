@@ -1,3 +1,5 @@
+// @flow
+
 import { PureComponent } from 'react';
 
 type PropsType = {
@@ -15,7 +17,7 @@ type StateType = {
 export default class PromisesComponent
   extends PureComponent<PropsType, StateType> {
 
-  prevPromise : ? Promise< any >;
+  prevPromises : ?{ [string] : Promise< any >};
 
   constructor() {
     super( ...arguments );
@@ -24,7 +26,7 @@ export default class PromisesComponent
       errors: {},
       values: {},
     };
-    this.prevPromise = null;
+    this.prevPromises = null;
   }
 
   componentDidMount() {

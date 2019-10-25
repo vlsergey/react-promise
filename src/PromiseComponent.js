@@ -1,3 +1,5 @@
+// @flow
+
 import { PureComponent } from 'react';
 
 type PropsType = {
