@@ -21,21 +21,21 @@ describe( 'PromisesComponent', () => {
     assert.ok( rendered );
 
     // not yet resolved
-    assert.equal( findRenderedDOMComponentWithClass( rendered, 'childClassName' ).innerText, '{}' );
+    assert.equal( findRenderedDOMComponentWithClass( rendered, 'childClassName' ).textContent, '{}' );
 
     // Resolving first promise...
     myResolve1( 'resolved' );
     await nextTick();
 
     // Expecting first promise result to be rendered already...
-    assert.equal( findRenderedDOMComponentWithClass( rendered, 'childClassName' ).innerText, '{"promise1":"resolved"}' );
+    assert.equal( findRenderedDOMComponentWithClass( rendered, 'childClassName' ).textContent, '{"promise1":"resolved"}' );
 
     // Resolving second promise...
     myResolve2( 'resolved' );
     await nextTick();
 
     // Expecting second promise result to be rendered already...
-    assert.equal( findRenderedDOMComponentWithClass( rendered, 'childClassName' ).innerText, '{"promise1":"resolved","promise2":"resolved"}' );
+    assert.equal( findRenderedDOMComponentWithClass( rendered, 'childClassName' ).textContent, '{"promise1":"resolved","promise2":"resolved"}' );
   } );
 
 } );

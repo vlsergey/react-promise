@@ -3,7 +3,7 @@
 import { PureComponent } from 'react';
 
 type PropsType = {
-  children : any => any,
+  children : { [string] : ?any } => any,
   cleanOnChange? : ?boolean,
   promises? : { [string] : Promise< any >},
 };
