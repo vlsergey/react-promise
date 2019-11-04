@@ -2,7 +2,9 @@
 
 Simple ReactJS components for Promise calculation.
 
-[![Build Status](https://travis-ci.org/vlsergey/react-promise.svg?branch=master)](https://travis-ci.org/vlsergey/react-promise)
+[![NPM version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![Downloads][downloads-image]][downloads-url]
 
 ```javascript
 import { PromiseComponent, PromisesComponent } from "@vlsergey/react-promise";
@@ -48,3 +50,10 @@ class MyComponent extends PureComponent {
 	}
 }
 ```
+
+[npm-image]: https://img.shields.io/npm/v/@vlsergey/react-promise.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/@vlsergey/react-promise
+[travis-image]: https://travis-ci.org/vlsergey/react-promise.svg?branch=master
+[travis-url]: https://travis-ci.org/vlsergey/react-promise
+[downloads-image]: http://img.shields.io/npm/dm/@vlsergey/react-promise.svg?style=flat-square
+[downloads-url]: https://npmjs.org/package/@vlsergey/react-promise
