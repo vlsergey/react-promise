@@ -34,8 +34,8 @@ return <PromisesComponent
 * One shall not create new promise in `render()` method of component. Promise shall be created in `componentDidMount()` method of component. Another way is to use memoize function in `render()` method:
 
 ```javascript
-import memoizeOne from "memoizeOne";
-import {PromiseComponent} from "@vlsergey/react-promise";
+import memoizeOne from "memoize-one";
+import { PromiseComponent } from "@vlsergey/react-promise";
 
 class MyComponent extends PureComponent {
 	constructor() {
