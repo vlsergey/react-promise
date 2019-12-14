@@ -6,8 +6,9 @@ Simple ReactJS components for Promise calculation.
 [![Build Status][travis-image]][travis-url]
 [![Downloads][downloads-image]][downloads-url]
 
+#### Usage with single Promise
 ```javascript
-import { PromiseComponent, PromisesComponent } from "@vlsergey/react-promise";
+import { PromiseComponent } from "@vlsergey/react-promise";
 /* ... */
 const promise
 return <PromiseComponent
@@ -15,6 +16,11 @@ return <PromiseComponent
 	promise={ promise }>
 		{(data) => <span>Promise result: {JSON.stringify(data)}}</span>}
 </PromiseComponent>;
+```
+
+#### Usage with multiple Promise's
+```javascript
+import { PromisesComponent } from "@vlsergey/react-promise";
 
 /* ... */
 const multiplePromises = {
