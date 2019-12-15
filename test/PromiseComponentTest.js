@@ -98,8 +98,6 @@ describe( 'PromiseComponent', () => {
     assert.equal( 'initial', findRenderedDOMComponentWithClass( rendered1, 'childClassName' ).innerHTML );
     assert.equal( FallbackCounter.renderCounter, prevFallbackRendered + 1 );
 
-    console.log( 'PromiseComponentTest: next component' );
-
     // render with same promise -- shall not lead to fallback render at all
     // since result is cached
     prevFallbackRendered = FallbackCounter.renderCounter;
