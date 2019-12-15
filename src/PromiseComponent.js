@@ -1,22 +1,26 @@
 // @flow
 
+import { find, set } from './memoize';
 import { PureComponent } from 'react';
 
+type ValueType = any;
+
 type PropsType = {
-  children : any => any,
+  children : ValueType => any,
   cleanOnChange? : ?boolean,
   fallback? : ?any,
-  promise? : ?Promise< any >,
+  promise? : ?Promise< ValueType >,
 };
 
 type StateType = {
   error : ?any,
-  value? : ?any,
+  value? : ?ValueType,
 };
 
 export default class PromiseComponent extends PureComponent<PropsType, StateType> {
 
-  prevPromise : ? Promise< any >;
+  isMounted : boolean;
+  prevPromise : ?Promise< ValueType >;
 
   constructor() {
     super( ...arguments );
@@ -24,10 +28,17 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
       error: null,
       value: null,
     };
+
+    // $FlowFixMe
+    this.setValue = this.setValue.bind( this );
+
+    this.isMounted = false;
     this.prevPromise = null;
+    this.subscribe();
   }
 
   componentDidMount() {
+    this.isMounted = true;
     this.subscribe();
   }
 
@@ -37,23 +48,43 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
 
   componentWillUnmount() {
     this.unsubscribe();
+    this.isMounted = false;
+  }
+
+  setValue( value : ?ValueType ) {
+    /* eslint react/no-direct-mutation-state: 0 */
+    if ( this.isMounted ) {
+      this.setState( { error: null, value } );
+    } else {
+      this.state = { ...this.state, error: null, value };
+    }
   }
 
   subscribe() {
     const { cleanOnChange, promise } = this.props;
-    if ( promise instanceof Promise && this.prevPromise !== promise ) {
-      if ( cleanOnChange ) this.setState( { error: null, value: null } );
+    if ( this.prevPromise !== promise ) {
+      if ( cleanOnChange ) {
+        this.setValue( null );
+      }
       this.prevPromise = promise;
-      promise.then( value => {
-        if ( this.prevPromise === promise ) {
-          this.setState( { error: null, value } );
-        }
-      } )
-        .catch( error => {
+
+      if ( promise !== undefined && promise !== null ) {
+        const cachedResult : ?ValueType = find( promise );
+        if ( cachedResult ) this.setValue( cachedResult );
+
+        promise.then( ( value : ?ValueType ) => {
+          // cache promise result
+          set( promise, value );
           if ( this.prevPromise === promise ) {
-            this.setState( { error, value: null } );
+            this.setState( { error: null, value } );
           }
-        } );
+        } )
+          .catch( error => {
+            if ( this.prevPromise === promise ) {
+              this.setState( { error, value: null } );
+            }
+          } );
+      }
     }
   }
 
@@ -74,6 +105,5 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
       return fallback || null;
     }
     return children( value );
-
   }
 }

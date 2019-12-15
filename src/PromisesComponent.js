@@ -1,6 +1,8 @@
 // @flow
 
+import { find, set } from './memoize';
 import { PureComponent } from 'react';
+import shallowCompare from './shallowCompare';
 
 type PropsType = {
   children : { [string] : ?any } => any,
@@ -17,6 +19,7 @@ type StateType = {
 export default class PromisesComponent
   extends PureComponent<PropsType, StateType> {
 
+  isMounted : boolean;
   prevPromises : ?{ [string] : Promise< any >};
 
   constructor() {
@@ -26,10 +29,19 @@ export default class PromisesComponent
       errors: {},
       values: {},
     };
+
+    // $FlowFixMe
+    this.cleanValues = this.cleanValues.bind( this );
+    // $FlowFixMe
+    this.setValue = this.setValue.bind( this );
+
+    this.isMounted = false;
     this.prevPromises = null;
+    this.subscribe();
   }
 
   componentDidMount() {
+    this.isMounted = true;
     this.subscribe();
   }
 
@@ -39,28 +51,49 @@ export default class PromisesComponent
 
   componentWillUnmount() {
     this.unsubscribe();
+    this.isMounted = false;
+  }
+
+  cleanValues( ) {
+    /* eslint react/no-direct-mutation-state: 0 */
+    if ( this.isMounted ) {
+      this.setState( { error: null, errors: {}, values: {} } );
+    } else {
+      this.state = { ...this.state, error: null, errors: {}, values: {} };
+    }
+  }
+
+  setValue( key : string, value : any ) {
+    /* eslint react/no-direct-mutation-state: 0 */
+    if ( this.isMounted ) {
+      this.setState( state => ( {
+        values: { ...state.values, [ key ]: value },
+      } ) );
+    } else {
+      this.state = { ...this.state, values: { ...this.state.values, [ key ]: value } };
+    }
   }
 
   subscribe() {
     const { cleanOnChange, promises } = this.props;
-    if ( promises === null || promises === undefined || this.prevPromises === promises ) {
+    if ( shallowCompare( this.prevPromises, promises ) ) {
       return;
     }
-    if ( cleanOnChange ) {
-      this.setState( { error: null, errors: {}, values: {} } );
-    }
+    if ( cleanOnChange ) this.cleanValues();
     this.prevPromises = promises;
 
-    Object.keys( promises ).forEach( key => {
-      promises[ key ]
+    if ( promises === null || promises === undefined ) return;
+    Object.keys( promises ).forEach( ( key : string ) => {
+      const promise : Promise< any > = promises[ key ];
+
+      const cachedResult = find( promise );
+      if ( cachedResult ) this.setValue( key, cachedResult );
+
+      promise
         .then( value => {
+          set( promise, value );
           if ( this.prevPromises === promises ) {
-            this.setState( state => ( {
-              values: {
-                ...state.values,
-                [ key ]: value,
-              },
-            } ) );
+            this.setValue( key, value );
           }
         } )
         .catch( error => {
