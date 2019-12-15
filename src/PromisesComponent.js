@@ -19,8 +19,8 @@ type StateType = {
 export default class PromisesComponent
   extends PureComponent<PropsType, StateType> {
 
-  isMounted : boolean;
-  prevPromises : ?{ [string] : Promise< any >};
+  _isMounted : boolean;
+  _prevPromises : ?{ [string] : Promise< any >};
 
   constructor() {
     super( ...arguments );
@@ -35,13 +35,13 @@ export default class PromisesComponent
     // $FlowFixMe
     this.setValue = this.setValue.bind( this );
 
-    this.isMounted = false;
-    this.prevPromises = null;
+    this._isMounted = false;
+    this._prevPromises = null;
     this.subscribe();
   }
 
   componentDidMount() {
-    this.isMounted = true;
+    this._isMounted = true;
     this.subscribe();
   }
 
@@ -51,12 +51,12 @@ export default class PromisesComponent
 
   componentWillUnmount() {
     this.unsubscribe();
-    this.isMounted = false;
+    this._isMounted = false;
   }
 
   cleanValues( ) {
     /* eslint react/no-direct-mutation-state: 0 */
-    if ( this.isMounted ) {
+    if ( this._isMounted ) {
       this.setState( { error: null, errors: {}, values: {} } );
     } else {
       this.state = { ...this.state, error: null, errors: {}, values: {} };
@@ -65,7 +65,7 @@ export default class PromisesComponent
 
   setValue( key : string, value : any ) {
     /* eslint react/no-direct-mutation-state: 0 */
-    if ( this.isMounted ) {
+    if ( this._isMounted ) {
       this.setState( state => ( {
         values: { ...state.values, [ key ]: value },
       } ) );
@@ -76,11 +76,11 @@ export default class PromisesComponent
 
   subscribe() {
     const { cleanOnChange, promises } = this.props;
-    if ( shallowCompare( this.prevPromises, promises ) ) {
+    if ( shallowCompare( this._prevPromises, promises ) ) {
       return;
     }
     if ( cleanOnChange ) this.cleanValues();
-    this.prevPromises = promises;
+    this._prevPromises = promises;
 
     if ( promises === null || promises === undefined ) return;
     Object.keys( promises ).forEach( ( key : string ) => {
@@ -92,12 +92,12 @@ export default class PromisesComponent
       promise
         .then( value => {
           set( promise, value );
-          if ( this.prevPromises === promises ) {
+          if ( this._prevPromises === promises ) {
             this.setValue( key, value );
           }
         } )
         .catch( error => {
-          if ( this.prevPromises === promises ) {
+          if ( this._prevPromises === promises ) {
             this.setState( state => ( {
               error,
               errors: {
@@ -111,8 +111,8 @@ export default class PromisesComponent
   }
 
   unsubscribe( ) {
-    if ( this.prevPromises !== null ) {
-      this.prevPromises = null;
+    if ( this._prevPromises !== null ) {
+      this._prevPromises = null;
     }
   }
 

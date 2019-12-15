@@ -19,8 +19,8 @@ type StateType = {
 
 export default class PromiseComponent extends PureComponent<PropsType, StateType> {
 
-  isMounted : boolean;
-  prevPromise : ?Promise< ValueType >;
+  _isMounted : boolean;
+  _prevPromise : ?Promise< ValueType >;
 
   constructor() {
     super( ...arguments );
@@ -32,13 +32,13 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
     // $FlowFixMe
     this.setValue = this.setValue.bind( this );
 
-    this.isMounted = false;
-    this.prevPromise = null;
+    this._isMounted = false;
+    this._prevPromise = null;
     this.subscribe();
   }
 
   componentDidMount() {
-    this.isMounted = true;
+    this._isMounted = true;
     this.subscribe();
   }
 
@@ -48,12 +48,12 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
 
   componentWillUnmount() {
     this.unsubscribe();
-    this.isMounted = false;
+    this._isMounted = false;
   }
 
   setValue( value : ?ValueType ) {
     /* eslint react/no-direct-mutation-state: 0 */
-    if ( this.isMounted ) {
+    if ( this._isMounted ) {
       this.setState( { error: null, value } );
     } else {
       this.state = { ...this.state, error: null, value };
@@ -62,11 +62,11 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
 
   subscribe() {
     const { cleanOnChange, promise } = this.props;
-    if ( this.prevPromise !== promise ) {
+    if ( this._prevPromise !== promise ) {
       if ( cleanOnChange ) {
         this.setValue( null );
       }
-      this.prevPromise = promise;
+      this._prevPromise = promise;
 
       if ( promise !== undefined && promise !== null ) {
         const cachedResult : ?ValueType = find( promise );
@@ -75,12 +75,12 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
         promise.then( ( value : ?ValueType ) => {
           // cache promise result
           set( promise, value );
-          if ( this.prevPromise === promise ) {
+          if ( this._prevPromise === promise ) {
             this.setState( { error: null, value } );
           }
         } )
           .catch( error => {
-            if ( this.prevPromise === promise ) {
+            if ( this._prevPromise === promise ) {
               this.setState( { error, value: null } );
             }
           } );
@@ -89,8 +89,8 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
   }
 
   unsubscribe( ) {
-    if ( this.prevPromise !== null ) {
-      this.prevPromise = null;
+    if ( this._prevPromise !== null ) {
+      this._prevPromise = null;
     }
   }
 
