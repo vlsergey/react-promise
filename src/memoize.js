@@ -1,6 +1,6 @@
 // @flow
 
-const symbol : Symbol = Symbol( '@vlsergey/react-promise: memoize promise result' );
+const symbol = Symbol( '@vlsergey/react-promise: memoize promise result' );
 
 export function find<T>( promise : ?Promise< T > ) : ?T {
   if ( !promise ) return null;
