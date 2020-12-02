@@ -1,6 +1,7 @@
 // @flow
 
-import { find, set } from './memoize';
+import * as memoize from './memoize';
+import { boundMethod } from 'autobind-decorator';
 import { PureComponent } from 'react';
 import shallowCompare from './shallowCompare';
 
@@ -30,11 +31,6 @@ export default class PromisesComponent
       values: {},
     };
 
-    // $FlowFixMe
-    this.cleanValues = this.cleanValues.bind( this );
-    // $FlowFixMe
-    this.setValue = this.setValue.bind( this );
-
     this._isMounted = false;
     this._prevPromises = null;
     this.subscribe();
@@ -54,15 +50,12 @@ export default class PromisesComponent
     this._isMounted = false;
   }
 
+  @boundMethod
   cleanValues( ) {
-    /* eslint react/no-direct-mutation-state: 0 */
-    if ( this._isMounted ) {
-      this.setState( { error: null, errors: {}, values: {} } );
-    } else {
-      this.state = { ...this.state, error: null, errors: {}, values: {} };
-    }
+    this.resetValues();
   }
 
+  @boundMethod
   setValue( key : string, value : any ) {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
@@ -74,24 +67,34 @@ export default class PromisesComponent
     }
   }
 
+  @boundMethod
+  resetValues( ) {
+    /* eslint react/no-direct-mutation-state: 0 */
+    if ( this._isMounted ) {
+      this.setState( { error: null, errors: {}, values: {} } );
+    } else {
+      this.state = { ...this.state, error: null, errors: {}, values: {} };
+    }
+  }
+
   subscribe() {
     const { cleanOnChange, promises } = this.props;
     if ( shallowCompare( this._prevPromises, promises ) ) {
       return;
     }
-    if ( cleanOnChange ) this.cleanValues();
+    if ( cleanOnChange ) this.resetValues();
     this._prevPromises = promises;
 
     if ( promises === null || promises === undefined ) return;
     Object.keys( promises ).forEach( ( key : string ) => {
       const promise : Promise< any > = promises[ key ];
 
-      const cachedResult = find( promise );
+      const cachedResult = memoize.find( promise );
       if ( cachedResult ) this.setValue( key, cachedResult );
 
       promise
         .then( value => {
-          set( promise, value );
+          memoize.set( promise, value );
           if ( this._prevPromises === promises ) {
             this.setValue( key, value );
           }

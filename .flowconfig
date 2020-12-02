@@ -1,9 +1,6 @@
 [ignore]
-.*node_modules/.*
-.*test/.*
-.*\.config\.js
-.*\.conf\.js
-.*\.json
+.*/lib/.*\.js\.flow
+.*/test/.*.js
 
 [lints]
 untyped-import=off

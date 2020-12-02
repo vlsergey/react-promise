@@ -1,6 +1,7 @@
 // @flow
 
-import { find, set } from './memoize';
+import * as memoize from './memoize';
+import { boundMethod } from 'autobind-decorator';
 import { PureComponent } from 'react';
 
 type ValueType = any;
@@ -13,27 +14,24 @@ type PropsType = {
 };
 
 type StateType = {
+  completed : boolean,
   error : ?any,
   value? : ?ValueType,
 };
 
 export default class PromiseComponent extends PureComponent<PropsType, StateType> {
 
-  _isMounted : boolean;
-  _prevPromise : ?Promise< ValueType >;
+  _isMounted : boolean = false;
+  _prevPromise : ?Promise< ValueType > = null;
+
+  state : StateType = {
+    error: null,
+    completed: false,
+    value: null,
+  };
 
   constructor() {
     super( ...arguments );
-    this.state = {
-      error: null,
-      value: null,
-    };
-
-    // $FlowFixMe
-    this.setValue = this.setValue.bind( this );
-
-    this._isMounted = false;
-    this._prevPromise = null;
     this.subscribe();
   }
 
@@ -51,12 +49,23 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
     this._isMounted = false;
   }
 
+  @boundMethod
+  resetValue() {
+    /* eslint react/no-direct-mutation-state: 0 */
+    if ( this._isMounted ) {
+      this.setState( { error: null, completed: false, value: undefined } );
+    } else {
+      this.state = { ...this.state, error: null, completed: false, value: undefined };
+    }
+  }
+
+  @boundMethod
   setValue( value : ?ValueType ) {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
-      this.setState( { error: null, value } );
+      this.setState( { error: null, completed: true, value } );
     } else {
-      this.state = { ...this.state, error: null, value };
+      this.state = { ...this.state, error: null, completed: true, value };
     }
   }
 
@@ -64,24 +73,24 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
     const { cleanOnChange, promise } = this.props;
     if ( this._prevPromise !== promise ) {
       if ( cleanOnChange ) {
-        this.setValue( null );
+        this.resetValue();
       }
       this._prevPromise = promise;
 
       if ( promise !== undefined && promise !== null ) {
-        const cachedResult : ?ValueType = find( promise );
+        const cachedResult : ?ValueType = memoize.find( promise );
         if ( cachedResult ) this.setValue( cachedResult );
 
         promise.then( ( value : ?ValueType ) => {
           // cache promise result
-          set( promise, value );
+          memoize.set( promise, value );
           if ( this._prevPromise === promise ) {
-            this.setState( { error: null, value } );
+            this.setValue( value );
           }
         } )
           .catch( error => {
             if ( this._prevPromise === promise ) {
-              this.setState( { error, value: null } );
+              this.setState( { error, completed: true, value: null } );
             }
           } );
       }
@@ -96,13 +105,13 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
 
   render() : any {
     const { children, fallback } = this.props;
-    const { error, value } = this.state;
+    const { error, completed, value } = this.state;
 
+    if ( !completed ) {
+      return fallback || null;
+    }
     if ( error !== null ) {
       throw error;
-    }
-    if ( value === undefined || value === null ) {
-      return fallback || null;
     }
     return children( value );
   }

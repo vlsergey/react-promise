@@ -39,6 +39,7 @@
   "devDependencies": {
     "@vlsergey/babel-config": "^0.8.1",
     "@vlsergey/eslint-config": "^0.7.0",
+    "autobind-decorator": "^2.4.0",
     "babel-loader": "^8.2.2",
     "core-js": "^3.8.0",
     "cross-env": "^7.0.3",
