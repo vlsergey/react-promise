@@ -94,7 +94,7 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
     }
   }
 
-  render() {
+  render() : any {
     const { children, fallback } = this.props;
     const { error, value } = this.state;
 

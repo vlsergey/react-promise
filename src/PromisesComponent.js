@@ -116,7 +116,7 @@ export default class PromisesComponent
     }
   }
 
-  render() {
+  render() : any {
     const { children } = this.props;
     const { error, values } = this.state;
     if ( error !== null ) {
