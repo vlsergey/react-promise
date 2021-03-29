@@ -1,56 +1,52 @@
-// @flow
-
 import * as memoize from './memoize';
+import { PureComponent, ReactNode } from 'react';
 import { boundMethod } from 'autobind-decorator';
-import { PureComponent } from 'react';
 
-type ValueType = any;
+interface PropsType<T> {
+  children : ( value : T ) => ReactNode;
+  cleanOnChange? : boolean;
+  fallback? : ReactNode;
+  promise? : Promise< T >;
+}
 
-type PropsType = {
-  children : ValueType => any,
-  cleanOnChange? : ?boolean,
-  fallback? : ?any,
-  promise? : ?Promise< ValueType >,
-};
+interface StateType<T, E> {
+  completed : boolean;
+  error : E | null;
+  value : T | null;
+}
 
-type StateType = {
-  completed : boolean,
-  error : ?any,
-  value? : ?ValueType,
-};
+export default class PromiseComponent<T, E> extends PureComponent<PropsType<T>, StateType<T, E>> {
 
-export default class PromiseComponent extends PureComponent<PropsType, StateType> {
+  _isMounted = false;
+  _prevPromise : Promise<T> | null = null;
 
-  _isMounted : boolean = false;
-  _prevPromise : ?Promise< ValueType > = null;
-
-  state : StateType = {
+  state : StateType<T, E> = {
     error: null,
     completed: false,
     value: null,
   };
 
-  constructor() {
-    super( ...arguments );
+  constructor( props: PropsType<T> | Readonly<PropsType<T>> ) {
+    super( props );
     this.subscribe();
   }
 
-  componentDidMount() {
+  componentDidMount() : void {
     this._isMounted = true;
     this.subscribe();
   }
 
-  componentDidUpdate( ) {
+  public componentDidUpdate( ) : void {
     this.subscribe();
   }
 
-  componentWillUnmount() {
+  componentWillUnmount() : void {
     this.unsubscribe();
     this._isMounted = false;
   }
 
   @boundMethod
-  resetValue() {
+  resetValue() : void {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
       this.setState( { error: null, completed: false, value: undefined } );
@@ -60,7 +56,7 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
   }
 
   @boundMethod
-  setValue( value : ?ValueType ) {
+  setValue( value : T | null | undefined ) : void {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
       this.setState( { error: null, completed: true, value } );
@@ -69,7 +65,7 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
     }
   }
 
-  subscribe() {
+  subscribe() : void {
     const { cleanOnChange, promise } = this.props;
     if ( this._prevPromise !== promise ) {
       if ( cleanOnChange ) {
@@ -78,17 +74,17 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
       this._prevPromise = promise;
 
       if ( promise !== undefined && promise !== null ) {
-        const cachedResult : ?ValueType = memoize.find( promise );
+        const cachedResult : T | null | undefined = memoize.find( promise );
         if ( cachedResult ) this.setValue( cachedResult );
 
-        promise.then( ( value : ?ValueType ) => {
+        promise.then( ( value : T | null | undefined ) => {
           // cache promise result
           memoize.set( promise, value );
           if ( this._prevPromise === promise ) {
             this.setValue( value );
           }
         } )
-          .catch( error => {
+          .catch( ( error : E ) => {
             if ( this._prevPromise === promise ) {
               this.setState( { error, completed: true, value: null } );
             }
@@ -97,13 +93,13 @@ export default class PromiseComponent extends PureComponent<PropsType, StateType
     }
   }
 
-  unsubscribe( ) {
+  unsubscribe( ) : void {
     if ( this._prevPromise !== null ) {
       this._prevPromise = null;
     }
   }
 
-  render() : any {
+  render() : ReactNode {
     const { children, fallback } = this.props;
     const { error, completed, value } = this.state;
 

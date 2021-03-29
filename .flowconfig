@@ -1,7 +1,0 @@
-[ignore]
-.*/lib/.*\.js\.flow
-.*/test/.*.js
-
-[lints]
-untyped-import=off
-unclear-type=off

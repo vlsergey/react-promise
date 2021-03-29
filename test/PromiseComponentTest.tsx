@@ -1,14 +1,12 @@
-// @flow
-
 import { findRenderedDOMComponentWithClass, renderIntoDocument } from 'react-dom/test-utils';
 import React, { PureComponent } from 'react';
-import assert from 'assert';
-import PromiseComponent from 'PromiseComponent';
+import { assert } from 'chai';
+import PromiseComponent from '../src/PromiseComponent';
 
-const nextTick = () => new Promise<any>( resolve => setTimeout( resolve, 0 ) );
+const nextTick = () => new Promise<void>( resolve => window.setTimeout( resolve, 0 ) );
 
-class FallbackCounter extends PureComponent<void> {
-  static renderCounter : number = 0;
+class FallbackCounter extends PureComponent<Record<string, never>> {
+  static renderCounter = 0;
 
   render() {
     FallbackCounter.renderCounter++;
@@ -20,7 +18,7 @@ type WrapperStateType = {
   promise : Promise< string >,
 };
 
-class Wrapper extends PureComponent<void, WrapperStateType> {
+class Wrapper extends PureComponent<Record<string, never>, WrapperStateType> {
 
   state = {
     promise: Promise.resolve( 'initial' ),
@@ -43,8 +41,8 @@ class Wrapper extends PureComponent<void, WrapperStateType> {
 describe( 'PromiseComponent', () => {
 
   it( 'can render on resolve', async() => {
-    let myResolve;
-    const promise = new Promise( resolve => {
+    let myResolve : ( result : string ) => void;
+    const promise = new Promise<string>( resolve => {
       myResolve = resolve;
     } );
 
@@ -52,7 +50,7 @@ describe( 'PromiseComponent', () => {
       fallback={<div className="fallbackClassName" />}
       promise={promise}>
       {() => <div className="childClassName" />}
-    </PromiseComponent> );
+    </PromiseComponent> ) as unknown as PromiseComponent<string, unknown>;
     assert.ok( rendered );
 
     // not yet resolved
@@ -76,7 +74,7 @@ describe( 'PromiseComponent', () => {
       fallback={<FallbackCounter />}
       promise={promise}>
       {data => <div className="childClassName">{data}</div>}
-    </PromiseComponent> );
+    </PromiseComponent> ) as unknown as PromiseComponent<string, unknown>;
 
     assert.ok( rendered );
     await nextTick();
@@ -91,7 +89,7 @@ describe( 'PromiseComponent', () => {
       fallback={<FallbackCounter />}
       promise={promise}>
       {data => <div className="childClassName">{data}</div>}
-    </PromiseComponent> );
+    </PromiseComponent> ) as unknown as PromiseComponent<string, unknown>;
 
     assert.ok( rendered1 );
     await nextTick();
@@ -105,7 +103,7 @@ describe( 'PromiseComponent', () => {
       fallback={<FallbackCounter />}
       promise={promise}>
       {data => <div className="childClassName">{data}</div>}
-    </PromiseComponent> );
+    </PromiseComponent> ) as unknown as PromiseComponent<string, unknown>;
     assert.ok( rendered2 );
     await nextTick();
     assert.equal( 'initial', findRenderedDOMComponentWithClass( rendered2, 'childClassName' ).innerHTML );
@@ -113,13 +111,13 @@ describe( 'PromiseComponent', () => {
   } );
 
   it( 'Will not render fallback when promise replaced with immediatly resolved one', async() => {
-    const rendered = renderIntoDocument( <Wrapper /> );
+    const rendered : Wrapper = renderIntoDocument( <Wrapper /> ) as unknown as Wrapper;
     assert.ok( rendered );
     await nextTick();
     assert.equal( 'initial', findRenderedDOMComponentWithClass( rendered, 'childClassName' ).innerHTML );
 
     const prevFallbackRendered = FallbackCounter.renderCounter;
-    const anotherResolvedPromise = new Promise( resolve => { resolve( 'nextPromise' ); } );
+    const anotherResolvedPromise = new Promise<string>( resolve => { resolve( 'nextPromise' ); } );
     rendered.passNewPromise( anotherResolvedPromise );
     await nextTick();
     assert.equal( 'nextPromise', findRenderedDOMComponentWithClass( rendered, 'childClassName' ).innerHTML );

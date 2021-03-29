@@ -57,6 +57,24 @@ class MyComponent extends PureComponent {
 }
 ```
 
+#### Changelog
+Unspecified minor versions are for dependencies updates.
+
+##### 3.0.0
+* ⚡ Move from [flow](https://flow.org/) to [TypeScript](https://www.typescriptlang.org/).
+
+##### 2.6.0
+* 🐛 Support null and undefined as result of `Promise` (and let user decide what to do with it).
+
+##### 2.2.0
+* 🐎 Less rerendering in some cases (like already resolved promise or shallow-same promises object in `PromisesComponent`)
+
+##### 2.0.0
+* 📦 Add [flow](https://flow.org/) type definitions to result package
+
+##### 1.0.1
+* 🎉 Initial version
+
 [npm-image]: https://img.shields.io/npm/v/@vlsergey/react-promise.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/@vlsergey/react-promise
 [travis-image]: https://travis-ci.org/vlsergey/react-promise.svg?branch=master

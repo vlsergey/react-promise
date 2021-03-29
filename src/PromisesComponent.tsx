@@ -1,65 +1,61 @@
-// @flow
-
 import * as memoize from './memoize';
+import { PureComponent, ReactNode } from 'react';
 import { boundMethod } from 'autobind-decorator';
-import { PureComponent } from 'react';
 import shallowCompare from './shallowCompare';
 
-type PropsType = {
-  children : { [string] : ?any } => any,
-  cleanOnChange? : ?boolean,
-  promises? : { [string] : Promise< any >},
-};
+interface PropsType<T> {
+  children : ( values : Record<string, T> ) => ReactNode;
+  cleanOnChange? : boolean;
+  promises? : Record<string, Promise< T >>;
+}
 
-type StateType = {
-  error : ?any,
-  errors : { [string ] : ?any },
-  values : { [string ] : ?any },
-};
+interface StateType<T, E> {
+  error : E | null,
+  errors : Record<string, E>,
+  values : Record<string, T>,
+}
 
-export default class PromisesComponent
-  extends PureComponent<PropsType, StateType> {
+export default class PromisesComponent<T, E>
+  extends PureComponent<PropsType<T>, StateType<T, E>> {
 
-  _isMounted : boolean;
-  _prevPromises : ?{ [string] : Promise< any >};
+  _isMounted = false;
+  _prevPromises : Record<string, Promise< T >> | null = null;
 
-  constructor() {
-    super( ...arguments );
-    this.state = {
-      error: null,
-      errors: {},
-      values: {},
-    };
+  state : StateType<T, E> = {
+    error: null,
+    errors: {},
+    values: {},
+  };
 
-    this._isMounted = false;
-    this._prevPromises = null;
+  constructor( props: PropsType<T> | Readonly<PropsType<T>> ) {
+    super( props );
     this.subscribe();
   }
 
-  componentDidMount() {
+  componentDidMount() : void {
     this._isMounted = true;
     this.subscribe();
   }
 
-  componentDidUpdate( ) {
+  componentDidUpdate() : void {
     this.subscribe();
   }
 
-  componentWillUnmount() {
+  componentWillUnmount() : void {
     this.unsubscribe();
     this._isMounted = false;
   }
 
   @boundMethod
-  cleanValues( ) {
+  cleanValues() : void {
     this.resetValues();
   }
 
   @boundMethod
-  setValue( key : string, value : any ) {
+  setValue( key : string, value : T ) : void {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
-      this.setState( state => ( {
+      this.setState( ( state : StateType<T, E> ) => ( {
         values: { ...state.values, [ key ]: value },
       } ) );
     } else {
@@ -68,7 +64,7 @@ export default class PromisesComponent
   }
 
   @boundMethod
-  resetValues( ) {
+  resetValues() : void {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
       this.setState( { error: null, errors: {}, values: {} } );
@@ -77,7 +73,7 @@ export default class PromisesComponent
     }
   }
 
-  subscribe() {
+  subscribe() : void {
     const { cleanOnChange, promises } = this.props;
     if ( shallowCompare( this._prevPromises, promises ) ) {
       return;
@@ -87,9 +83,9 @@ export default class PromisesComponent
 
     if ( promises === null || promises === undefined ) return;
     Object.keys( promises ).forEach( ( key : string ) => {
-      const promise : Promise< any > = promises[ key ];
+      const promise : Promise< T > = promises[ key ];
 
-      const cachedResult = memoize.find( promise );
+      const cachedResult : T = memoize.find( promise );
       if ( cachedResult ) this.setValue( key, cachedResult );
 
       promise
@@ -99,9 +95,9 @@ export default class PromisesComponent
             this.setValue( key, value );
           }
         } )
-        .catch( error => {
+        .catch( ( error:E ) => {
           if ( this._prevPromises === promises ) {
-            this.setState( state => ( {
+            this.setState( ( state : StateType<T, E> ) => ( {
               error,
               errors: {
                 ...state.errors,
@@ -113,13 +109,13 @@ export default class PromisesComponent
     } );
   }
 
-  unsubscribe( ) {
+  unsubscribe( ) : void {
     if ( this._prevPromises !== null ) {
       this._prevPromises = null;
     }
   }
 
-  render() : any {
+  render() : ReactNode {
     const { children } = this.props;
     const { error, values } = this.state;
     if ( error !== null ) {

@@ -1,19 +1,19 @@
 {
   "name": "@vlsergey/react-promise",
-  "version": "2.6.0",
+  "version": "3.0.0",
   "description": "React wrappers for Promises",
   "main": "lib/index.js",
   "module": "lib/index.js",
   "scripts": {
-    "build": "cross-env NODE_ENV=production babel -d lib src && flow-copy-source -v src lib",
-    "flow:check": "flow check",
-    "flow:status": "flow status",
-    "eslint:check": "eslint --ignore-pattern \"!.eslintrc.js\" .eslintrc.js babel.config.js karma.conf.js src/**/*.js test/**/*.js",
-    "eslint:fix": "eslint --ignore-pattern \"!.eslintrc.js\" --fix .eslintrc.js babel.config.js karma.conf.js src/**/*.js test/**/*.js",
-    "test": "cross-env BROWSERSLIST=\"current node\" NODE_ENV=development karma start karma.conf.js --single-run",
-    "test:watch": "cross-env BROWSERSLIST=\"current node\" NODE_ENV=development karma start karma.conf.js --no-single-run",
-    "test:watch:chrome": "cross-env BROWSERSLIST=\"last 2 Chrome versions\" NODE_ENV=development karma start karma.conf.js --no-single-run --browsers Chrome",
-    "preversion": "npm run eslint:fix && npm run flow:check && npm test && npm run build",
+    "clean": "rimraf lib/",
+    "build": "cross-env NODE_ENV=production tsc -p ./src",
+    "build:watch": "cross-env NODE_ENV=development tsc -w -p ./src",
+    "eslint:check": "eslint --ignore-pattern \"!.eslintrc.js\" .eslintrc.js karma.conf.js src/**/*.ts src/**/*.tsx test/**/*.js test/**/*.tsx",
+    "eslint:fix": "eslint --ignore-pattern \"!.eslintrc.js\" --fix .eslintrc.js karma.conf.js src/**/*.ts src/**/*.tsx test/**/*.js test/**/*.tsx",
+    "test": "cross-env NODE_ENV=development karma start karma.conf.js --single-run",
+    "test:watch": "cross-env NODE_ENV=development karma start karma.conf.js --no-single-run",
+    "test:watch:chrome": "cross-env NODE_ENV=development karma start karma.conf.js --no-single-run --browsers Chrome",
+    "preversion": "npm run eslint:fix && npm test && npm run clean && npm run build",
     "version": "npm publish --access=public",
     "postversion": "git push && git push --tags"
   },
@@ -37,31 +37,11 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@vlsergey/babel-config": "^0.8.1",
-    "@vlsergey/eslint-config": "^0.7.0",
-    "autobind-decorator": "^2.4.0",
-    "babel-loader": "^8.2.2",
-    "core-js": "^3.8.0",
-    "cross-env": "^7.0.3",
-    "flow-copy-source": "^2.0.9",
-    "jsdom": "^16.4.0",
-    "karma": "^5.2.3",
-    "karma-chrome-launcher": "^3.1.0",
-    "karma-jsdom-launcher": "^8.0.2",
-    "karma-mocha": "^2.0.1",
-    "karma-mocha-reporter": "^2.2.5",
-    "karma-sourcemap-loader": "^0.3.8",
-    "karma-webpack": "^4.0.2",
-    "mocha": "^8.2.1",
-    "prop-types": "^15.7.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "regenerator-runtime": "^0.13.7",
-    "webpack": "^4.44.2"
+    "@vlsergey/js-config": "^0.0.9"
   },
   "peerDependencies": {
-    "prop-types": "^15.7.0",
-    "react": "^16.0.0,^17.0.0",
-    "react-dom": "^16.0.0,^17.0.0"
+    "prop-types": ">=15.7",
+    "react": ">=16",
+    "react-dom": ">=16"
   }
 }
