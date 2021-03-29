@@ -64,10 +64,10 @@ Unspecified minor versions are for dependencies updates.
 * ⚡ Move from [flow](https://flow.org/) to [TypeScript](https://www.typescriptlang.org/).
 
 ##### 2.6.0
-* 🐛 Support null and undefined as result of `Promise` (and let user decide what to do with it).
+* 🐛 Support `null` and `undefined` as result of `Promise` (and let user decide what to do with it).
 
 ##### 2.2.0
-* 🐎 Less rerendering in some cases (like already resolved promise or shallow-same promises object in `PromisesComponent`)
+* 🐎 Less rerendering in some cases (like already resolved `Promise` or shallow-same promises object in `PromisesComponent`)
 
 ##### 2.0.0
 * 📦 Add [flow](https://flow.org/) type definitions to result package
