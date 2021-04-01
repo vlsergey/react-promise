@@ -37,7 +37,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@vlsergey/js-config": "^0.0.9"
+    "@vlsergey/js-config": "^1.0.0"
   },
   "peerDependencies": {
     "prop-types": ">=15.7",

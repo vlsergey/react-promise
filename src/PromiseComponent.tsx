@@ -1,6 +1,5 @@
 import * as memoize from './memoize';
 import { PureComponent, ReactNode } from 'react';
-import { boundMethod } from 'autobind-decorator';
 
 interface PropsType<T> {
   children : ( value : T ) => ReactNode;
@@ -45,8 +44,7 @@ export default class PromiseComponent<T, E> extends PureComponent<PropsType<T>, 
     this._isMounted = false;
   }
 
-  @boundMethod
-  resetValue() : void {
+  resetValue = () : void => {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
       this.setState( { error: null, completed: false, value: undefined } );
@@ -55,8 +53,7 @@ export default class PromiseComponent<T, E> extends PureComponent<PropsType<T>, 
     }
   }
 
-  @boundMethod
-  setValue( value : T | null | undefined ) : void {
+  setValue = ( value : T | null | undefined ) : void => {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
       this.setState( { error: null, completed: true, value } );

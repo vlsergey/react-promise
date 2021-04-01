@@ -1,6 +1,5 @@
 import * as memoize from './memoize';
 import { PureComponent, ReactNode } from 'react';
-import { boundMethod } from 'autobind-decorator';
 import shallowCompare from './shallowCompare';
 
 interface PropsType<T> {
@@ -46,13 +45,11 @@ export default class PromisesComponent<T, E>
     this._isMounted = false;
   }
 
-  @boundMethod
-  cleanValues() : void {
+  cleanValues = () : void => {
     this.resetValues();
   }
 
-  @boundMethod
-  setValue( key : string, value : T ) : void {
+  setValue = ( key : string, value : T ) : void => {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
       this.setState( ( state : StateType<T, E> ) => ( {
@@ -63,8 +60,7 @@ export default class PromisesComponent<T, E>
     }
   }
 
-  @boundMethod
-  resetValues() : void {
+  resetValues = () : void => {
     /* eslint react/no-direct-mutation-state: 0 */
     if ( this._isMounted ) {
       this.setState( { error: null, errors: {}, values: {} } );
@@ -109,7 +105,7 @@ export default class PromisesComponent<T, E>
     } );
   }
 
-  unsubscribe( ) : void {
+  unsubscribe() : void {
     if ( this._prevPromises !== null ) {
       this._prevPromises = null;
     }
