@@ -60,6 +60,12 @@ class MyComponent extends PureComponent {
 #### Changelog
 Unspecified minor versions are for dependencies updates.
 
+##### 3.2.0
+* 📦 Add hybrid CommonJS + ESM packaging.
+
+##### 3.1.0
+* Replace `autobind-decorator` with arrow function per @bradzacher advise in typescript-eslint/typescript-eslint#3245.
+
 ##### 3.0.0
 * ⚡ Move from [flow](https://flow.org/) to [TypeScript](https://www.typescriptlang.org/).
 
