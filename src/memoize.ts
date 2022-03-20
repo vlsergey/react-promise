@@ -1,21 +1,13 @@
-/* eslint @typescript-eslint/no-misused-promises: 0 */
+const SYMBOL: unique symbol = Symbol('@vlsergey/react-promise: memoize promise result');
 
-// i have no idea what eslint expects here...
-// eslint-disable-next-line
-const mySymbol = Symbol( '@vlsergey/react-promise: memoize promise result' );
-
-interface PromiseAsBag<T> extends Promise<T> {
-  [mySymbol]?: T;
+interface SymbolHolder {
+  [SYMBOL]: unknown;
 }
 
-export function find<T>( promise : Promise<T> | null | undefined ) : T | null | undefined {
-  if ( !promise ) return null;
-  const asBag : PromiseAsBag<T> = promise;
-  return asBag[ mySymbol ];
+export function find<T> (promise: Promise< T >): T | undefined {
+  return (promise as unknown as SymbolHolder)[SYMBOL] as T | undefined;
 }
 
-export function set<T>( promise : Promise< T > | null | undefined, result : T | null | undefined ) : void {
-  if ( !promise ) throw new Error( 'Missing promise argument' );
-  const asBag : PromiseAsBag<T> = promise;
-  asBag[ mySymbol ] = result;
+export function set<T> (promise: Promise< T >, result: T | undefined): void {
+  (promise as unknown as SymbolHolder)[SYMBOL] = result;
 }

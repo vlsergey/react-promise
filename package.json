@@ -5,15 +5,16 @@
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "scripts": {
-    "clean": "rimraf lib/",
+    "clean": "rimraf lib/*",
     "build": "cross-env NODE_ENV=production tsc -p ./src/tsconfig-cjs.json && cross-env NODE_ENV=production tsc -p ./src/tsconfig-esm.json",
-    "build:watch": "cross-env NODE_ENV=development tsc -w -p ./src",
-    "eslint:check": "eslint --ignore-pattern \"!.eslintrc.js\" .eslintrc.js karma.conf.js src/**/*.ts src/**/*.tsx test/**/*.js test/**/*.tsx",
-    "eslint:fix": "eslint --ignore-pattern \"!.eslintrc.js\" --fix .eslintrc.js karma.conf.js src/**/*.ts src/**/*.tsx test/**/*.js test/**/*.tsx",
+    "build:watch": "cross-env NODE_ENV=development tsc -w --preserveWatchOutput -p ./src/tsconfig-esm.json",
+    "check": "npm run eslint:fix && npm run build && npm run test",
+    "eslint:check": "eslint --ignore-pattern \"!.eslintrc.js\" .eslintrc.js karma.conf.js src/**/*.ts* test/**/*.ts*",
+    "eslint:fix": "eslint --ignore-pattern \"!.eslintrc.js\" --fix .eslintrc.js karma.conf.js src/**/*.ts* test/**/*.ts*",
     "test": "cross-env NODE_ENV=development karma start karma.conf.js --single-run",
     "test:watch": "cross-env NODE_ENV=development karma start karma.conf.js --no-single-run",
     "test:watch:chrome": "cross-env NODE_ENV=development karma start karma.conf.js --no-single-run --browsers Chrome",
-    "preversion": "npm run eslint:fix && npm test && npm run clean && npm run build",
+    "preversion": "npm run build && npm run eslint:fix && npm test && npm run clean && npm run build",
     "version": "npm publish --access=public",
     "postversion": "git push && git push --tags"
   },
@@ -37,7 +38,10 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@vlsergey/js-config": "^1.0.0"
+    "@vlsergey/js-config": "^10.1.0",
+    "prop-types": "^15.7.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
   },
   "peerDependencies": {
     "prop-types": ">=15.7",
