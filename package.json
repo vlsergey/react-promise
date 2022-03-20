@@ -1,6 +1,6 @@
 {
   "name": "@vlsergey/react-promise",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "description": "React wrappers for Promises",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
